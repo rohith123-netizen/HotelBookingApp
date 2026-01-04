@@ -1,16 +1,42 @@
-# React + Vite
+# Hotel Owner Dashboard & Add Room Module
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project contains two core UI components used in a hotel owner panel:
 
-Currently, two official plugins are available:
+1. **Dashboard** – Displays bookings, revenue, and recent activity
+2. **Add Room** – Allows hotel owners to add new rooms with images, pricing, and amenities
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Both components are built using **React**, **React Router**, and **Tailwind CSS**.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 1. Dashboard Component
 
-## Expanding the ESLint configuration
+### Purpose
+The Dashboard provides hotel owners with an overview of:
+- Total bookings
+- Total revenue
+- Recent bookings with payment status
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+It acts as the **default (index) page** inside the owner layout.
+
+---
+
+### Key Features
+- Uses `useState` to manage dashboard data
+- Displays summary cards (bookings & revenue)
+- Renders recent bookings in a table
+- Payment status is visually differentiated (Completed / Pending)
+
+---
+
+### Concepts Used
+- `useState` for reactive data
+- `.map()` for rendering lists
+- Conditional styling based on payment status
+- Semantic HTML tables (`table`, `thead`, `tbody`, `tr`, `td`)
+
+---
+
+### Data Flow
+```txt
+dashboardDummyData → useState → UI Render
