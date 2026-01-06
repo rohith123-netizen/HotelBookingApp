@@ -40,3 +40,64 @@ It acts as the **default (index) page** inside the owner layout.
 ### Data Flow
 ```txt
 dashboardDummyData → useState → UI Render
+
+
+# 🏨 Room Details Page
+
+This project includes a **Room Details** page used in a hotel booking application.
+
+The page displays complete information about a selected hotel room, including images, amenities, pricing, availability, and host details.
+
+It is built using **React**, **React Router**, and **Tailwind CSS**.
+
+---
+
+## 1. RoomDetails Component
+
+### Purpose
+The RoomDetails component is responsible for:
+
+- Displaying detailed information about a selected room
+- Showing an interactive image gallery
+- Listing amenities and room specifications
+- Allowing users to check room availability
+- Displaying host and review information
+
+This page is rendered when a user navigates to:
+
+
+---
+
+### Key Features
+- Fetches room data using URL parameters
+- Displays a main image with clickable thumbnails
+- Shows hotel name, room type, discount, and price per night
+- Renders amenities with icons
+- Includes a check-in / check-out availability form
+- Displays host information with ratings
+- Fully responsive layout
+
+---
+
+### Concepts Used
+- `useParams` for dynamic routing
+- `useState` for local state management
+- `useEffect` for loading room data
+- Conditional rendering
+- `.map()` for dynamic list rendering
+- Reusable components (`StarRating`)
+- Tailwind CSS utility classes
+
+---
+
+### Data Flow
+```txt
+URL (room id)
+      ↓
+useParams()
+      ↓
+roomsDummyData.find()
+      ↓
+useState (room, mainImage)
+      ↓
+UI Render
