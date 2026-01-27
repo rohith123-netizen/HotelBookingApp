@@ -1,8 +1,12 @@
 import User from "../models/User.js";
 import { Webhook } from "svix";
+import connectDB from "../configs/db.js";
 
 const clerkWebhooks = async (req, res) => {
   try {
+    // 🔑 MUST be first (Vercel cold start)
+    await connectDB();
+
     const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
     const headers = {
@@ -11,39 +15,44 @@ const clerkWebhooks = async (req, res) => {
       "svix-signature": req.headers["svix-signature"],
     };
 
-    // ✅ VERIFY USING RAW BODY (Buffer)
     const event = whook.verify(req.body, headers);
 
     const { data, type } = event;
 
+    // 🔑 SAFE email extraction
+    const email =
+      data.email_addresses?.[0]?.email_address ||
+      data.primary_email_address?.email_address ||
+      "";
+
     const userData = {
       _id: data.id,
-      email: data.email_addresses[0].email_address,
-      username: `${data.first_name} ${data.last_name}`,
+      email,
+      username: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
       image: data.image_url,
+      role: "user",
+      recentSearchedCities: [],
     };
 
-    switch (type) {
-      case "user.created":
+    if (type === "user.created") {
+      const exists = await User.findById(data.id);
+      if (!exists) {
         await User.create(userData);
-        break;
+      }
+    }
 
-      case "user.updated":
-        await User.findByIdAndUpdate(data.id, userData);
-        break;
+    if (type === "user.updated") {
+      await User.findByIdAndUpdate(data.id, userData);
+    }
 
-      case "user.deleted":
-        await User.findByIdAndDelete(data.id);
-        break;
-
-      default:
-        break;
+    if (type === "user.deleted") {
+      await User.findByIdAndDelete(data.id);
     }
 
     res.status(200).json({ success: true });
   } catch (error) {
-    console.error("Webhook verification failed:", error);
-    res.status(400).json({ success: false });
+    console.error("Webhook error:", error);
+    res.status(400).json({ success: false, error: error.message });
   }
 };
 
