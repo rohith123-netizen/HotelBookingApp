@@ -3,58 +3,47 @@ import { Webhook } from "svix";
 
 const clerkWebhooks = async (req, res) => {
   try {
-    // 1. Create Svix webhook instance using Clerk secret
     const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
-    // 2. Extract required Svix headers from request
     const headers = {
       "svix-id": req.headers["svix-id"],
       "svix-timestamp": req.headers["svix-timestamp"],
       "svix-signature": req.headers["svix-signature"],
     };
 
-    // 3. Verify webhook authenticity
-    await whook.verify(JSON.stringify(req.body), headers);
+    // ✅ VERIFY USING RAW BODY (Buffer)
+    const event = whook.verify(req.body, headers);
 
-    // 4. Extract data from webhook payload
-    const { data, type } = req.body;
+    const { data, type } = event;
 
-    // 5. Prepare user object for database
     const userData = {
       _id: data.id,
       email: data.email_addresses[0].email_address,
-      username: data.first_name + " " + data.last_name,
+      username: `${data.first_name} ${data.last_name}`,
       image: data.image_url,
     };
 
-    // 6. Handle different webhook events
     switch (type) {
-      case "user.created": {
+      case "user.created":
         await User.create(userData);
         break;
-      }
 
-      case "user.updated": {
+      case "user.updated":
         await User.findByIdAndUpdate(data.id, userData);
         break;
-      }
 
-      case "user.deleted": {
+      case "user.deleted":
         await User.findByIdAndDelete(data.id);
         break;
-      }
 
       default:
         break;
     }
 
-    // 7. Send success response
-    res.json({ success: true, message: "Webhook Received" });
-
+    res.status(200).json({ success: true });
   } catch (error) {
-    // 8. Error handling
-    console.log(error.message);
-    res.json({ success: false, message: error.message });
+    console.error("Webhook verification failed:", error);
+    res.status(400).json({ success: false });
   }
 };
 
